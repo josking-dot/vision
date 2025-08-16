@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 // SVG Icons for a cleaner UI without external dependencies
 const UploadIcon = () => (
@@ -41,6 +42,7 @@ const Spinner = () => (
 
 
 export default function Home() {
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -151,6 +153,16 @@ export default function Home() {
   const removeItem = (index) => {
     const updatedItems = editableItems.filter((_, i) => i !== index);
     setEditableItems(updatedItems);
+  };
+
+  const handleSplitBill = () => {
+    // Store the bill data in localStorage to pass to the split page
+    const billDataToPass = {
+      items: editableItems,
+      total: total
+    };
+    localStorage.setItem('billData', JSON.stringify(billDataToPass));
+    router.push('/split');
   };
 
   return (
@@ -306,10 +318,16 @@ export default function Home() {
             {/* Total Section - Placed outside and below the grid */}
             {billData && !loading && (
                 <div className="mt-8 bg-white rounded-2xl shadow-lg p-6 max-w-md mx-auto">
-                     <div className="flex justify-between items-center text-2xl font-bold text-slate-900">
+                     <div className="flex justify-between items-center text-2xl font-bold text-slate-900 mb-4">
                         <span>Total:</span>
                         <span className="text-orange-600">${total}</span>
                     </div>
+                    <button
+                      onClick={handleSplitBill}
+                      className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg font-semibold text-lg transition-all duration-300 shadow-sm hover:shadow-md animate-gradient"
+                    >
+                      Split Bill
+                    </button>
                 </div>
             )}
         </div>
